@@ -15,7 +15,7 @@ public class Autonomous extends LinearOpMode {
     // Autonomous constants
     public double COUNTS_PER_INCH = (1120 / (4 * Math.PI));     // Find encoder counts per inch
     public double DRIVE_SPEED = 1;
-    public double TURN_SPEED = 0.7;
+    public double TURN_SPEED  = 0.7;
     public double SHOOT_SPEED = 1;
     public double FLICK_SPEED = 0.6;
 
@@ -37,22 +37,29 @@ public class Autonomous extends LinearOpMode {
         telemetry.addData("Instructions", "Use the dpad to select which program is run");
         telemetry.addData("Instructions", "Press Y to calibrate the gyro before autonomous starts");
 
-        // Select alliance
-        if (gamepad1.x) {
-            ALLIANCE_COEFF = 1;
-        } if (gamepad1.b) {
-            ALLIANCE_COEFF = -1;
-        }
+        // Select alliance and program
+        if (!opModeIsActive()) {
 
-        // Select program
-        if (gamepad1.dpad_up) {
-            PROGRAM_COEFF = 1;
-        } if (gamepad1.dpad_right) {
-            PROGRAM_COEFF = 2;
-        } if (gamepad1.dpad_down) {
-            PROGRAM_COEFF = 3;
-        } if (gamepad1.dpad_left) {
-            PROGRAM_COEFF = 4;
+            // Alliance
+            if (gamepad1.x) {
+                ALLIANCE_COEFF = 1;
+            } if (gamepad1.b) {
+                ALLIANCE_COEFF = -1;
+            }
+
+            // Program
+            if (gamepad1.dpad_up) {
+                PROGRAM_COEFF = 1; // 80 point autonomous:
+            }
+            if (gamepad1.dpad_right) {
+                PROGRAM_COEFF = 2; // 20 point autonomous: Knock cap ball and go up ramp and shoot
+            }
+            if (gamepad1.dpad_down) {
+                PROGRAM_COEFF = 3; // 5 point autonomous: Knock cap ball, get out of the way
+            }
+            if (gamepad1.dpad_left) {
+                PROGRAM_COEFF = 4; // Not determined yet
+            }
         }
 
         // Calibrate gyro in the init by using Y
@@ -79,11 +86,20 @@ public class Autonomous extends LinearOpMode {
         if (PROGRAM_COEFF == 2) {
             /* Steps for program */
 
+            drive(42, true);            // Drive forward 42 inches and pause after
+            turn(135, true);            // Turn 135 degrees and pause after
+            drive(52, false);           // Drive forward 52 inches
+            shootParticles(4, false);   // Shoot particles preloaded in the chamber
+
         }
 
         /* Program 3, use dpad down to select it */
         if (PROGRAM_COEFF == 3) {
             /* Steps for program */
+
+            drive(42, false);    // Drive forward 42 inches to hit cap ball
+            sleep(1000);
+            drive(-46, false);
 
         }
 
@@ -96,7 +112,7 @@ public class Autonomous extends LinearOpMode {
     }
 
     /* Start autonomous methods */
-    public void drive(double inches) {
+    public void drive(double inches, boolean sleep) {
 
         if (opModeIsActive()) {
 
@@ -152,10 +168,14 @@ public class Autonomous extends LinearOpMode {
             // Turn off run to position
             robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            // Optional wait time after path
+            if (sleep)
+                sleep(100);
         }
     }
 
-    public void turn(double angle) {
+    public void turn(double angle, boolean sleep) {
 
         // Multiply angle by alliance coefficient
         angle *= ALLIANCE_COEFF;
@@ -181,13 +201,21 @@ public class Autonomous extends LinearOpMode {
         robot.leftMotor.setPower(0);
         robot.rightMotor.setPower(0);
 
+        // Optional wait time after path
+        if (sleep)
+            sleep(50);
     }
 
-    public void shootParticles(int seconds) {
+    public void shootParticles(int seconds, boolean sleep) {
 
+        // Shoot particles, then wait selected amount of time
         robot.spinner.setPower(SHOOT_SPEED);
         sleep((int)(seconds * 1000));
         robot.spinner.setPower(0);
+
+        // Optional wait time after path
+        if (sleep)
+            sleep(50);
     }
 
     /* public void flickParticles(int rotations) { } */
