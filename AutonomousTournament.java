@@ -44,6 +44,7 @@ public class AutonomousTournament extends DefineRobot {
     @Override
     public void start() {
 
+        Autonomous.start();
         // Check if gyro is calibrated
         /*if (!CALIBRATED_GYRO) {
             calibrateGyro();
@@ -51,39 +52,62 @@ public class AutonomousTournament extends DefineRobot {
 
         /* Describe programs below */
 
-        /* Hit cap ball and shoot up ramp */
-        if (program == hitCapBallShootUpRamp && CALIBRATED_GYRO) {
+        /*Hit cap ball and shoot up ramp*/
+        /*if (program == hitCapBallShootUpRamp && CALIBRATED_GYRO) {
 
-            /* Steps for program */
-            drive(0.6, 42);
+            Steps for program
+            drive(0.7, 42);
             turn(123);
-            drive(0.6, 52);
+            drive(0.7, 52);
             shootParticles(3);
 
         }
 
-        /* The program to do it all */
+        The program to do it all
         if (program == theProgramToDoItAll && CALIBRATED_GYRO) {
 
-            /* Steps for program */
-            drive(0.6, 46);
-            turn(130);
-            drive(0.6, 50);
-            shootParticles(3);
+            Steps for program
+            drive(0.7, 72);
+            turn(90);
+            drive(0.7, 54);
+            //shootParticles(3);
+            //waitSleep(1000);
 
         }
-        /* Hit cap ball and go back */
+        Hit cap ball and go back
         if (program == hitCapBallGoBack && CALIBRATED_GYRO) {
 
-            /* Steps for program */
+            Steps for program
+            drive(0.7, 24);
+            turn(180);
 
         }
 
-        /* Avoid the main field and hit beacons */
+        Avoid the main field and hit beacons
         if (program == avoidFieldHitBeacons && CALIBRATED_GYRO) {
 
-            /* Steps for program */
+            Steps for program
+            drive(0.7, 24);
+            waitSleep(1000);
+            drive(0.7, 24);
 
-        }
+        }*/
     }
+
+    Runnable AutoPro = new Runnable() {
+        public void run() {
+            drive(0.7, 72);
+            turn(90);
+            drive(0.7, 54);
+            shootParticles(3);
+        }
+    };
+
+    // Create the autonomous thread
+    Thread Autonomous = new Thread(AutoPro);
+
+    @Override public void loop() {
+        leftMotor.setPower(leftSpeed);
+    }
+
 }

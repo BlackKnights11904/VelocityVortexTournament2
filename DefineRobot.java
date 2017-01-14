@@ -2,25 +2,31 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /* This is our hardware file, or where we define all the hardware on our robot */
 
 public class DefineRobot extends OpMode {
 
     // Define drive motors
-    public DcMotor leftMotor = null;
-    public DcMotor rightMotor = null;
+    DcMotor leftMotor = null;
+    DcMotor rightMotor = null;
 
     // Define miscellaneous motors
-    public DcMotor spinner = null;
-    public DcMotor buttonPusher = null;
+    DcMotor spinner = null;
+    DcMotor buttonPusher = null;
 
     // Define peripherals
-    public ModernRoboticsI2cGyro gyro = null;
+    ModernRoboticsI2cGyro gyro = null;
+    ColorSensor colorSensor = null;
+
+    // Elapsed time
+    ElapsedTime runtime = new ElapsedTime();
 
     // Find counts per inch
-    public double COUNTS_PER_INCH = (1120 / (4 * Math.PI));
+    double COUNTS_PER_INCH = (1120 / (4 * Math.PI));
 
     // Selective autonomous and alliance variables
     int alliance;
@@ -32,8 +38,13 @@ public class DefineRobot extends OpMode {
     final int hitCapBallGoBack = 3;
     final int avoidFieldHitBeacons = 4;
 
+    // Stuff here
+    double leftSpeed;
+    double rightSpeed;
+
     // Prevent errors from multiple usage of init commands
     boolean CALIBRATED_GYRO = false;
+    boolean firstPress = true;
 
     // Find components on hardware map
     public void init() {
@@ -48,6 +59,9 @@ public class DefineRobot extends OpMode {
 
         // Hardware map gyro and allow use of Z integrated value
         gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
+
+        // Hardware map color sensor
+        colorSensor = hardwareMap.colorSensor.get("color sensor");
 
         // Set direction of drive motors
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -79,16 +93,19 @@ public class DefineRobot extends OpMode {
     public void loop() {
     }
 
-    public void waitSleep(int millis) {
+    public void stop() {
+    }
+
+    void waitSleep(int millis) {
         try {
             Thread.sleep(millis);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException ex) {
             
         }
     }
 
     /* Start of autonomous methods */
-    public void drive(double speed, double inches) {
+    void drive(double speed, double inches) {
 
         // Determine heading at start to not drift
         //double heading = gyro.getHeading();
@@ -105,12 +122,14 @@ public class DefineRobot extends OpMode {
         rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Turn on drive motors
+        leftSpeed = speed;
+        rightSpeed = speed;
         leftMotor.setPower(speed);
         rightMotor.setPower(speed);
 
         // Loop while not on target
         while (leftMotor.isBusy() && rightMotor.isBusy()) {
-            telemetry.addLine("Moving to position");
+            //telemetry.addData("left enc", String.valueOf(leftMotor.getCurrentPosition()) + "\n right enc" + rightMotor.getCurrentPosition());
             telemetry.update();
         }
 
@@ -193,15 +212,19 @@ public class DefineRobot extends OpMode {
         }
     }
 
-    public void shootParticles(int seconds) {
+    void shootParticles(int seconds) {
+
+        long time1 = System.currentTimeMillis();
 
         // Shoot particles, then wait selected amount of time
-        spinner.setPower(0.9);
-        waitSleep(seconds * 1000);
+        while (System.currentTimeMillis() <= (time1 + (seconds * 1000))) {
+            spinner.setPower(0.9);
+        }
         spinner.setPower(0);
+
     }
 
-    public void calibrateGyro() {
+    void calibrateGyro() {
 
         CALIBRATED_GYRO = true;
 
@@ -225,14 +248,14 @@ public class DefineRobot extends OpMode {
     }
 
 
-    public void pressBeacon() {
+    void pressBeacon() {
 
-        buttonPusher.setPower(-0.45 * alliance);
-        waitSleep(700);
+        buttonPusher.setPower(0.45);
+        waitSleep(500);
         buttonPusher.setPower(0);
-        waitSleep(50);
-        buttonPusher.setPower(0.45 * alliance);
-        waitSleep(700);
+        waitSleep(25);
+        buttonPusher.setPower(-0.45);
+        waitSleep(500);
         buttonPusher.setPower(0);
     }
 }

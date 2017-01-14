@@ -8,16 +8,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 //@Disabled
 public class ColorTest extends DefineRobot {
 
-    ColorSensor colorSensor = null;
-
     @Override
     public void init() {
-        colorSensor = hardwareMap.colorSensor.get("color sensor");
     }
 
     // Select autonomous and alliance
     @Override
     public void init_loop() {
+
+        alliance = blue;
 
         // Calibrate gyro manually ONLY DO IF YOU HAVE MORE THAN 3 SECONDS
         if (gamepad1.y && !CALIBRATED_GYRO) {
@@ -28,6 +27,7 @@ public class ColorTest extends DefineRobot {
     // Run program
     @Override
     public void start() {
+
         colorSensor.enableLed(false);
     }
 
@@ -36,5 +36,9 @@ public class ColorTest extends DefineRobot {
         telemetry.addData("color stuff", colorSensor.red());
         telemetry.addData("color stuff 2", colorSensor.blue());
         telemetry.update();
+
+        if (colorSensor.blue() > 1) {
+            pressBeacon();
+        }
     }
 }

@@ -9,13 +9,13 @@ public class TeleOpTournament extends DefineRobot {
     // Loop during game
     public void loop() {
 
-        leftMotor.setPower(-gamepad1.left_stick_y);
-        rightMotor.setPower(-gamepad1.right_stick_y);
+        leftMotor.setPower(-gamepad1.left_stick_y * 0.9);
+        rightMotor.setPower(-gamepad1.right_stick_y * 0.9);
 
         if (gamepad1.right_bumper && !gamepad1.left_bumper) {
-            spinner.setPower(0.9);
+            spinner.setPower(0.85);
         } if (gamepad1.left_bumper && !gamepad1.right_bumper) {
-            spinner.setPower(-0.8);
+            spinner.setPower(-0.75);
         } if (!gamepad1.right_bumper && !gamepad1.left_bumper) {
             spinner.setPower(0);
         }
